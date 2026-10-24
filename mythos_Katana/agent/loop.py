@@ -1,33 +1,40 @@
-import yaml, time, pathlib
-from memory import Memory
+import argparse, pathlib, yaml, time
+from .memory import Memory
+from .tools import mock_fetch
 from council.judge import judge_decision
 
-def load_config(path="config/config.yaml"):
-    return yaml.safe_load(open(path))
+def parse_args():
+    p=argparse.ArgumentParser()
+    p.add_argument('--config', required=True)
+    p.add_argument('--target')
+    p.add_argument('--targets')
+    p.add_argument('--engagement', required=True)
+    p.add_argument('--mode', choices=['passive','active'], default='passive')
+    p.add_argument('--max-iterations', type=int)
+    return p.parse_args()
 
 def main():
-    cfg = load_config()
-    mem = Memory()
-    print(f"[mythos_Katana] الهدف: {cfg['scope']['target']} | النمط: {cfg['persistence_engine']['mode']}")
-    for i in range(1, cfg['persistence_engine']['max_iterations']+1):
-        print(f"\n--- Iteration {i} ---")
-        # 1. Planner: اختبار واحد فقط (مثال دفاعي)
-        hypothesis = f"فحص إعدادات الأمان للهدف - جولة {i}"
-        # 2. Executor: أدوات آمنة فقط (مثال: فحص headers بدون هجوم)
-        evidence = {"hypothesis": hypothesis, "note": "passive check only - no exploit"}
-        mem.add(evidence)
-        # 3. Council review (مبسط)
-        decision = judge_decision(evidence, mem.all())
-        print(f"Council decision: {decision}")
-        if decision == "CONFIRMED":
-            mem.save_report("reports/final_report.md")
-            break
-        if decision == "NEEDS_MORE_TESTING":
-            continue
-        time.sleep(cfg['research']['delay_seconds'])
-    else:
-        mem.save_report("reports/final_report.md")
-        print("وصلنا للحد الأقصى، تم حفظ التقرير.")
+    args=parse_args()
+    cfg=yaml.safe_load(open(args.config))
+    max_iter=args.max_iterations or cfg['persistence_engine']['max_iterations']
+    # determine targets: CLI overrides config
+    targets=[]
+    if args.target: targets=[args.target]
+    elif args.targets: targets=[t.strip() for t in open(args.targets).read().splitlines() if t.strip()]
+    else: targets=[cfg['scope']['target']]
+    engagement_dir=pathlib.Path("reports")/args.engagement
+    mem=Memory(engagement_dir)
+    for target in targets:
+        mem.add({"target": target, "mode": args.mode})
+        for i in range(1, max_iter+1):
+            ev=mock_fetch(target, args.mode)
+            ev["iteration"]=i
+            mem.add(ev)
+            dec=judge_decision(ev, mem.all())
+            if dec=="CONFIRMED":
+                break
+    report=mem.save_report()
+    print(f"Done. Report: {report}")
 
-if __name__ == "__main__":
+if __name__=="__main__":
     main()
