@@ -177,3 +177,23 @@ def iac_scanner(t,**kw): return {"tool":"iac","issues":[]}
 def sast_mock(t,**kw): return {"tool":"sast","findings":[]}
 @tool("dast_mock")
 def dast_mock(t,**kw): return {"tool":"dast","findings":[]}
+@tool("secrets_entropy_check")
+def secrets_entropy_check(t,**kw): return {"tool":"secrets_entropy","leaks":[]}
+@tool("dependency_confusion_check")
+def dependency_confusion_check(t,**kw): return {"tool":"dep_confusion","vuln":False}
+@tool("typosquat_detector")
+def typosquat_detector(t,**kw): return {"tool":"typosquat","typos":[]}
+@tool("phishing_kit_detector")
+def phishing_kit_detector(t,**kw): return {"tool":"phishing_kit","found":False}
+@tool("malware_scanner_mock")
+def malware_scanner_mock(t,**kw): return {"tool":"malware_scan","infected":False}
+@tool("supply_chain_check")
+def supply_chain_check(t,**kw): return {"tool":"supply_chain","issues":[]}
+@tool("sbom_generator")
+def sbom_generator(t,**kw): return {"tool":"sbom","components":[]}
+@tool("license_compliance_check")
+def license_compliance_check(t,**kw): return {"tool":"license_check","issues":[]}
+@tool("privacy_headers_check")
+def privacy_headers_check(t,**kw): return {"tool":"privacy_headers","missing":[]}
+@tool("a11y_security_check")
+def a11y_security_check(t,**kw): return {"tool":"a11y_sec","issues":[]}
