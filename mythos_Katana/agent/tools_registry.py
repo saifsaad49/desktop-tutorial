@@ -103,3 +103,17 @@ def csp_analyzer(t,**kw): return {"tool":"csp_analyzer","issues":[]}
 def hsts_check(t,**kw): return {"tool":"hsts_check","enabled":True}
 @tool("clickjack_check")
 def clickjack_check(t,**kw): return {"tool":"clickjack","vuln":False}
+@tool("backup_finder")
+def backup_finder(t,**kw): return {"tool":"backup_finder","files":[]}
+@tool("env_leak_check")
+def env_leak_check(t,**kw): return {"tool":"env_leak","leaked":False}
+@tool("git_exposed_check")
+def git_exposed_check(t,**kw): return {"tool":"git_exposed","exposed":False}
+@tool("openapi_scanner")
+def openapi_scanner(t,**kw): return {"tool":"openapi","endpoints":[]}
+@tool("rate_limit_check")
+def rate_limit_check(t,**kw): return {"tool":"rate_limit","limited":True}
+@tool("bruteforce_protection_check")
+def bruteforce_protection_check(t,**kw): return {"tool":"bruteforce_protection","protected":True}
+@tool("subdomain_brute")
+def subdomain_brute(t,**kw): return {"tool":"subdomain_brute","found":[]}
