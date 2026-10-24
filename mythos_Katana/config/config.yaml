@@ -1,0 +1,23 @@
+project: mythos_Katana
+scope:
+  target: "lab.local" # غيره لهدفك المصرح به فقط
+  allow_passive_recon_only: true
+  allow_active_scan: false # فعله فقط في مختبرك المعزول
+
+research:
+  enabled: true
+  max_search_per_iteration: 3
+  sources: [nvd, docs]
+  respect_robots_txt: true
+  cache_results: true
+  delay_seconds: 2
+
+persistence_engine:
+  mode: "resilient_reasoning"
+  max_iterations: 20
+  backtrack_on_failure: true
+  stop_on: "high_confidence_finding"
+
+council:
+  members: [attacker, defender, auditor, judge, researcher, persister_strategist]
+  require_unanimous_for_confirmed: false
