@@ -157,3 +157,23 @@ def auth_bypass_mock(t,**kw): return {"tool":"auth_bypass","note":"logic only"}
 def priv_esc_mock(t,**kw): return {"tool":"priv_esc","note":"mock"}
 @tool("business_logic_scanner")
 def business_logic_scanner(t,**kw): return {"tool":"business_logic","issues":[]}
+@tool("api_rate_bypass_check")
+def api_rate_bypass_check(t,**kw): return {"tool":"api_rate_bypass","bypass":False}
+@tool("jwt_none_alg_check")
+def jwt_none_alg_check(t,**kw): return {"tool":"jwt_none","vuln":False}
+@tool("open_redirect_mock2")
+def open_redirect_mock2(t,**kw): return {"tool":"open_redirect2","vuln":False}
+@tool("subdomain_hijack_scanner")
+def subdomain_hijack_scanner(t,**kw): return {"tool":"subdomain_hijack","vuln":False}
+@tool("cloud_metadata_check")
+def cloud_metadata_check(t,**kw): return {"tool":"cloud_metadata","exposed":False}
+@tool("container_esc_mock")
+def container_esc_mock(t,**kw): return {"tool":"container_esc","note":"mock"}
+@tool("k8s_misconfig_check")
+def k8s_misconfig_check(t,**kw): return {"tool":"k8s_misconfig","issues":[]}
+@tool("iac_scanner")
+def iac_scanner(t,**kw): return {"tool":"iac","issues":[]}
+@tool("sast_mock")
+def sast_mock(t,**kw): return {"tool":"sast","findings":[]}
+@tool("dast_mock")
+def dast_mock(t,**kw): return {"tool":"dast","findings":[]}
