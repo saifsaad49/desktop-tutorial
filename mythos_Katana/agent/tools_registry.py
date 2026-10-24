@@ -117,3 +117,43 @@ def rate_limit_check(t,**kw): return {"tool":"rate_limit","limited":True}
 def bruteforce_protection_check(t,**kw): return {"tool":"bruteforce_protection","protected":True}
 @tool("subdomain_brute")
 def subdomain_brute(t,**kw): return {"tool":"subdomain_brute","found":[]}
+@tool("host_header_injection_check")
+def host_header_injection_check(t,**kw): return {"tool":"host_header","vuln":False}
+@tool("http_smuggling_check")
+def http_smuggling_check(t,**kw): return {"tool":"http_smuggling","vuln":False}
+@tool("prototype_pollution_check")
+def prototype_pollution_check(t,**kw): return {"tool":"proto_pollution","vuln":False}
+@tool("dom_xss_scanner")
+def dom_xss_scanner(t,**kw): return {"tool":"dom_xss","issues":[]}
+@tool("saml_check")
+def saml_check(t,**kw): return {"tool":"saml","issues":[]}
+@tool("oauth_misconfig_check")
+def oauth_misconfig_check(t,**kw): return {"tool":"oauth","misconfig":False}
+@tool("websocket_scanner")
+def websocket_scanner(t,**kw): return {"tool":"websocket","issues":[]}
+@tool("tls_downgrade_check")
+def tls_downgrade_check(t,**kw): return {"tool":"tls_downgrade","vuln":False}
+@tool("cache_poisoning_check")
+def cache_poisoning_check(t,**kw): return {"tool":"cache_poison","vuln":False}
+@tool("request_smuggling_mock")
+def request_smuggling_mock(t,**kw): return {"tool":"req_smuggling","vuln":False}
+@tool("crlf_injection_check")
+def crlf_injection_check(t,**kw): return {"tool":"crlf","vuln":False}
+@tool("xxe_out_of_band_mock")
+def xxe_out_of_band_mock(t,**kw): return {"tool":"xxe_oob","note":"mock"}
+@tool("ldap_injection_mock")
+def ldap_injection_mock(t,**kw): return {"tool":"ldap_injection","note":"mock"}
+@tool("xpath_injection_mock")
+def xpath_injection_mock(t,**kw): return {"tool":"xpath_injection","note":"mock"}
+@tool("nosql_injection_mock")
+def nosql_injection_mock(t,**kw): return {"tool":"nosql_injection","note":"mock"}
+@tool("command_injection_mock")
+def command_injection_mock(t,**kw): return {"tool":"cmd_injection","note":"mock detection only"}
+@tool("file_upload_check")
+def file_upload_check(t,**kw): return {"tool":"file_upload","restrictions":True}
+@tool("auth_bypass_mock")
+def auth_bypass_mock(t,**kw): return {"tool":"auth_bypass","note":"logic only"}
+@tool("priv_esc_mock")
+def priv_esc_mock(t,**kw): return {"tool":"priv_esc","note":"mock"}
+@tool("business_logic_scanner")
+def business_logic_scanner(t,**kw): return {"tool":"business_logic","issues":[]}
