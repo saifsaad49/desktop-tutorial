@@ -3,6 +3,7 @@ scope:
   target: "lab.local" # غيره لهدفك المصرح به فقط
   allow_passive_recon_only: true
   allow_active_scan: false # فعله فقط في مختبرك المعزول
+  allowed_hosts: null # e.g. [lab.local] to enforce allowlist
 
 research:
   enabled: true

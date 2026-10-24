@@ -197,3 +197,19 @@ def license_compliance_check(t,**kw): return {"tool":"license_check","issues":[]
 def privacy_headers_check(t,**kw): return {"tool":"privacy_headers","missing":[]}
 @tool("a11y_security_check")
 def a11y_security_check(t,**kw): return {"tool":"a11y_sec","issues":[]}
+
+# --- Scope guard ---
+def _scope_guard(target, allowed_hosts=None):
+    if allowed_hosts:
+        from urllib.parse import urlparse
+        h = (urlparse(target).hostname if "://" in target else target.split(":")[0]).lower()
+        if h not in [x.lower() for x in allowed_hosts]:
+            return {"error": f"blocked: '{h}' outside allowed_hosts", "tool": "scope_guard"}
+    return None
+
+_orig_run_tool = run_tool
+def run_tool(name, target, allowed_hosts=None, **kw):
+    blocked = _scope_guard(target, allowed_hosts)
+    if blocked:
+        return blocked
+    return _orig_run_tool(name, target, **kw)
