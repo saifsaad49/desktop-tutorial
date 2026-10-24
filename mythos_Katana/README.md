@@ -1,22 +1,28 @@
-# mythos_Katana — مجلس التفكير المستمر
+# mythos_Katana ⚔️ — مجلس التفكير المستمر
 
-وكيل مستقل (Persistent Agent) للأمن السيبراني الدفاعي ودراسة سلوك التفكير المستمر.
-يعمل فقط داخل Scope محدد مسبقاً (Sandbox / Lab) بإذن كامل.
+> **Persistent Cyber Council Agent** — وكيل لا يتوقف يفكر، يحلل، يختبر، ويناقش نفسه عبر 6 عقول حتى يصل للحقيقة.
 
-## الفلسفة
-Think → Act → Observe → Council Review → Persist
-لا يتوقف عند أول فشل، بل يعيد التخطيط عبر مجلس استشاري.
+![license](https://img.shields.io/badge/license-MIT-blue) ![python](https://img.shields.io/badge/python-3.10%2B-green) ![scope](https://img.shields.io/badge/scope-sandbox%20only-orange)
 
-## المكونات
-- **الوكيل الأصلي (agent/loop.py)**: الحلقة المستمرة
-- **المجلس (council/)**: 6 عقول (مهاجم، مدافع، محقق، قاضي، باحث، موجه/استراتيجي)
-- **الذاكرة (agent/memory.py)**: حفظ كل التجارب
-- **التقارير (reports/)**: توثيق تلقائي
+## شنو هذا المشروع؟
+`mythos_Katana` مو سكانر عادي. هو **مهارة (Skill)** تخلي أي LLM يشتغل بعقلية Mythos — حلقة لا نهائية من التفكير والنقد الذاتي عبر مجلس استشاري دفاعي. مصمم للدراسة والبحث الدفاعي داخل **Sandbox/Lab** فقط.
 
-> يعمل فقط على أهداف تملكها. احترام Rate Limit و robots.txt إجباري.
+**الفلسفة:** Think → Act → Observe → Council Review → Persist
 
-## التشغيل
+## المجلس السداسي
+- 🔴 المهاجم: يقترح فرضية
+- 🔵 المدافع: يفند
+- 🟡 المحقق: يطلب دليل
+- ⚖️ القاضي: يحسم
+- 🌐 الباحث: OSINT ذكي (3/جولة + Cache)
+- ♾️ الموجه الاستراتيجي: يمنع التوقف ويقترح مسار B
+
+## التشغيل السريع
 ```bash
+git clone https://github.com/saifsaad49/desktop-tutorial.git
+cd mythos_Katana
 pip install -r requirements.txt
 python agent/loop.py --config config/config.yaml
 ```
+---
+**تنبيه:** للتعليم والدفاع فقط. الاستخدام على اهداف لا تملكها غير قانوني.

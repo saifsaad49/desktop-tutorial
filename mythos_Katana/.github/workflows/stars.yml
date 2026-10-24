@@ -1,0 +1,7 @@
+name: Welcome
+on: [star]
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Thanks for starring mythos_Katana!"
