@@ -1,4 +1,5 @@
 # mythos_Katana ⚔️ — When One Mind Is Not Enough
+[![trending](https://img.shields.io/badge/trending-cybersecurity-red)]() [![stars](https://img.shields.io/github/stars/saifsaad49/desktop-tutorial)]()
 
 > Six minds. One target. No stop condition until proof.
 
