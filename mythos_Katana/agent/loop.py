@@ -1,6 +1,7 @@
 import argparse, pathlib, yaml
 from .memory import Memory
-from .tools import mock_fetch
+from .tools_registry import run_tool, list_tools
+from .vector_memory import VectorMemory
 from council.judge import judge_decision
 
 def parse_args():
@@ -51,7 +52,8 @@ def main():
     for target in targets:
         mem.add({"target": target, "mode": args.mode, "consent": True})
         for i in range(1, max_iter+1):
-            ev=mock_fetch(target, args.mode)
+            tool_name = list_tools()[i % len(list_tools())]
+            ev=run_tool(tool_name, target)
             ev["iteration"]=i
             mem.add(ev)
             dec=judge_decision(ev, mem.all())
