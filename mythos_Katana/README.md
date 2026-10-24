@@ -59,3 +59,6 @@ We run this daily in our own sandbox. If you want private integrations, custom s
 
 #### Security notice
 Authorized lab research only. Test only assets you own or have explicit written approval to assess. Misuse is on you — not on us, not on nbn.life.
+
+## 📦 Install on any model
+See [INSTALL.md](INSTALL.md) for Claude Code, Codex, OpenCode, Hermes.
