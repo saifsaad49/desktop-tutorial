@@ -72,3 +72,28 @@ def dependency_check(t,**kw): return {"tool":"dependency_check","vulns":[]}
 def run_tool(name,target,**kw):
     return REGISTRY.get(name, lambda t,**k: {"error":"unknown"})(target,**kw)
 def list_tools(): return list(REGISTRY.keys())
+# --- Extra tools (still mocks) ---
+@tool("dir_bruteforce_mock")
+def dir_bruteforce_mock(t,**kw): return {"tool":"dir_bruteforce","found":[]}
+@tool("param_discovery")
+def param_discovery(t,**kw): return {"tool":"param_discovery","params":[]}
+@tool("csrf_check")
+def csrf_check(t,**kw): return {"tool":"csrf_check","protected":True}
+@tool("xxe_detector_mock")
+def xxe_detector_mock(t,**kw): return {"tool":"xxe_detector","note":"mock"}
+@tool("ssti_detector_mock")
+def ssti_detector_mock(t,**kw): return {"tool":"ssti_detector","note":"mock"}
+@tool("lfi_detector_mock")
+def lfi_detector_mock(t,**kw): return {"tool":"lfi_detector","note":"mock"}
+@tool("rce_detector_mock")
+def rce_detector_mock(t,**kw): return {"tool":"rce_detector","note":"mock detection only, no exec"}
+@tool("graphql_scanner")
+def graphql_scanner(t,**kw): return {"tool":"graphql","introspection":False}
+@tool("waf_detector")
+def waf_detector(t,**kw): return {"tool":"waf_detector","waf":"mock-waf"}
+@tool("bucket_finder")
+def bucket_finder(t,**kw): return {"tool":"bucket_finder","buckets":[]}
+@tool("subdomain_takeover_check")
+def subdomain_takeover_check(t,**kw): return {"tool":"takeover_check","vuln":False}
+@tool("email_harvester_mock")
+def email_harvester_mock(t,**kw): return {"tool":"email_harvester","emails":[]}
