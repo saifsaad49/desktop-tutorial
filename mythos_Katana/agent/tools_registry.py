@@ -97,3 +97,9 @@ def bucket_finder(t,**kw): return {"tool":"bucket_finder","buckets":[]}
 def subdomain_takeover_check(t,**kw): return {"tool":"takeover_check","vuln":False}
 @tool("email_harvester_mock")
 def email_harvester_mock(t,**kw): return {"tool":"email_harvester","emails":[]}
+@tool("csp_analyzer")
+def csp_analyzer(t,**kw): return {"tool":"csp_analyzer","issues":[]}
+@tool("hsts_check")
+def hsts_check(t,**kw): return {"tool":"hsts_check","enabled":True}
+@tool("clickjack_check")
+def clickjack_check(t,**kw): return {"tool":"clickjack","vuln":False}

@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "required": ["project","scope"],
+  "properties": {
+    "project": {"type":"string"},
+    "scope": {"type":"object"}
+  }
+}
