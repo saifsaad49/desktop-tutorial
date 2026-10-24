@@ -1,52 +1,60 @@
-# mythos_Katana ⚔️ — The Council That Never Sleeps
+# mythos_Katana ⚔️ — When One Mind Is Not Enough
 
-> **Persistent Autonomous Cyber Council.** 6 AI minds debating in a loop — Think → Act → Observe → Persist — until truth emerges.
+> Six minds. One target. No stop condition until proof.
 
-![license](https://img.shields.io/badge/license-MIT-blue) ![python](https://img.shields.io/badge/python-3.10%2B-green) ![scope](https://img.shields.io/badge/scope-sandbox--verified-orange) ![builtby](https://img.shields.io/badge/built%20by-nbn.life-black)
+[![MIT](https://img.shields.io/badge/license-MIT-blue)](#) [![Python](https://img.shields.io/badge/python-3.10%2B-3776AB)](#) [![Lab Verified](https://img.shields.io/badge/lab-verified%20only-orange)](#) [![by nbn.life](https://img.shields.io/badge/crafted%20by-nbn.life-0a0a0a)](https://nbn.life)
 
-**Built & Maintained by [nbn.life](https://nbn.life) — All rights reserved. Continuous updates & enterprise support.**
+**Crafted by the team at [nbn.life](https://nbn.life) — Offensive research, defensive engineering. We ship updates weekly.**
 
 ---
 
-## ⚡ The Power Concept
-Most agents answer once and stop. **mythos_Katana never stops.**
+### Why we built this
+Single-pass agents hallucinate. They see a 500 error and call it RCE.
 
-A single executor agent is linked to a **Council of 6** that critiques every finding:
-- **Attacker** proposes one hypothesis
-- **Defender** tries to falsify it
-- **Auditor** demands proof (logs/responses)
-- **Judge** rules: CONFIRMED / REJECTED / NEEDS_MORE_TESTING
-- **Researcher** does smart OSINT (max 3 queries/iteration, cached, respects robots.txt)
-- **Persister-Strategist** prevents halt — suggests alternative path B on failure
+In real ops, you don't trust one analyst. You put findings through a war-room.
 
-Result: **Zero hallucination, maximum persistence.** Inspired by the Mythos "never-stop-thinking" philosophy, engineered for defensive research.
+mythos_Katana is that war-room as code: one executor, six reviewers, one rule — *no finding leaves without evidence*.
 
-## 🚀 Quick Start
+### How it thinks
+The executor proposes **one** hypothesis per iteration. The council tears it apart:
+
+**Attacker** → "Here's how this could break."  
+**Defender** → "Here's why it wouldn't in prod — WAF, auth, config."  
+**Auditor** → "Show me the packet. No log = no claim."  
+**Judge** → `CONFIRMED | REJECTED | NEEDS_MORE_TESTING`  
+**Researcher** → pulls CVEs/docs (cached, 3 queries max/iter, respects robots.txt)  
+**Persister** → on REJECT, doesn't quit — pivots to Plan B and re-queues.
+
+Loop: `hypothesize → test (passive by default) → debate → pivot`. Stops only on `CONFIRMED` or `max_iterations`.
+
+Built after watching Mythos-style persistent reasoning and asking: *what if that persistence was auditable?*
+
+### Quick start — lab only
 ```bash
 git clone https://github.com/saifsaad49/desktop-tutorial.git
-cd mythos_Katana
+cd desktop-tutorial/mythos_Katana
 pip install -r requirements.txt
-# Set your AUTHORIZED lab target only
-nano config/config.yaml
+
+# point it at YOUR lab — not the internet
+vim config/config.yaml  # scope.target: lab.local
+
 python agent/loop.py --config config/config.yaml
-# Report auto-generated: reports/final_report.md
+# → reports/final_report.md
 ```
 
-## 🧠 Skill Mode
-Copy `SKILL.md` into any LLM (Claude / Cursor / Windsurf) — it instantly becomes a Katana Council.
+### Use it as a Skill
+Drop `SKILL.md` into Claude / Cursor / Windsurf. Any model becomes the council. No code change.
 
-## 📊 Example Output
-```
-Iteration 1: Hypothesis → Council: NEEDS_MORE_TESTING → Researcher fetches CVE
-Iteration 2: New evidence → Judge: REJECTED (no proof)
-Iteration 3: Persister pivots to path B → Judge: CONFIRMED
-Report saved to reports/final_report.md
-```
+### What you get
+- No more false positives passing as "critical"
+- Full trace: every debate logged to `reports/`
+- Tunable persistence: `max_iterations`, `backtrack_on_failure`
+- Safe by default: `allow_active_scan: false`
 
-## 🏢 Enterprise
-Updates, custom scopes, and private lab integration — contact us at **https://nbn.life**
+### From nbn.life
+We run this daily in our own sandbox. If you want private integrations, custom scopes, or hosted council — reach us at [nbn.life](https://nbn.life).
 
 ---
 
-### 🛡️ Security & Ethics Notice
-This project is for **authorized defensive research and education in isolated Sandbox/Lab environments only**. Use only on systems you own or have explicit written permission to test. The authors and nbn.life assume no liability for misuse.
+#### Security notice
+Authorized lab research only. Test only assets you own or have explicit written approval to assess. Misuse is on you — not on us, not on nbn.life.
