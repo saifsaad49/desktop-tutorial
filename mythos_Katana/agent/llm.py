@@ -27,18 +27,37 @@ def _timeout():
     except ValueError:
         return 45.0
 
+def _backoff():
+    try:
+        return float(os.environ.get("KATANA_LLM_BACKOFF", "15"))
+    except ValueError:
+        return 15.0
+
 def _retries():
     try:
         return int(os.environ.get("KATANA_LLM_RETRIES", "2"))
     except ValueError:
         return 2
 
+class LLMError(Exception):
+    def __init__(self, status, body):
+        super().__init__("HTTP %s: %s" % (status, body[:200]))
+        self.status = status
+        self.body = body
+
 def _post(url, headers, payload, timeout):
     req = urllib.request.Request(
         url, data=json.dumps(payload).encode(),
         headers={"Content-Type": "application/json", **headers}, method="POST")
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return json.loads(r.read().decode())
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return json.loads(r.read().decode())
+    except urllib.error.HTTPError as e:
+        try:
+            body = e.read().decode()
+        except Exception:
+            body = ""
+        raise LLMError(e.code, body)
 
 def available():
     p = _provider()
@@ -94,6 +113,13 @@ def ask(system, user, max_tokens=400):
                 LAST_ERROR = None
                 return out
             LAST_ERROR = "empty response"
+        except LLMError as e:
+            LAST_ERROR = "HTTP %s: %s" % (e.status, e.body[:160])
+            if e.status == 429:
+                # concurrency/rate limit - wait longer before retrying
+                if n < attempts - 1:
+                    time.sleep(_backoff() * (n + 1))
+                continue
         except Exception as e:
             LAST_ERROR = "%s: %s" % (type(e).__name__, e)
         if n < attempts - 1:
@@ -103,5 +129,5 @@ def ask(system, user, max_tokens=400):
 def status():
     p = _provider() or "none"
     model = os.environ.get("KATANA_LLM_MODEL") or DEFAULT_MODEL.get(p, "-")
-    return "provider=%s model=%s available=%s timeout=%ss retries=%s last_error=%s" % (
-        p, model, available(), _timeout(), _retries(), LAST_ERROR)
+    return "provider=%s model=%s available=%s timeout=%ss retries=%s backoff=%ss last_error=%s" % (
+        p, model, available(), _timeout(), _retries(), _backoff(), LAST_ERROR)
