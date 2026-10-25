@@ -1,7 +1,10 @@
 import time, subprocess, datetime, pathlib, json
 TARGET="maram.iq"
-LOG=pathlib.Path("/tmp/katana_persistent.log")
-MEM=pathlib.Path("/tmp/katana_mem.json")
+import os
+LOG=pathlib.Path(os.environ.get("KATANA_LOG", "/tmp/katana_persistent.log"))
+MEM=pathlib.Path(os.environ.get("KATANA_MEM", "/tmp/katana_mem.json"))
+LOG.parent.mkdir(parents=True, exist_ok=True)
+MEM.parent.mkdir(parents=True, exist_ok=True)
 def log(m):
     line=f"[{datetime.datetime.now().isoformat()}] {m}"
     print(line, flush=True)
