@@ -62,3 +62,6 @@ Authorized lab research only. Test only assets you own or have explicit written 
 
 ## 📦 Install on any model
 See [INSTALL.md](INSTALL.md) for Claude Code, Codex, OpenCode, Hermes.
+
+## 🧠 Real LLM mode
+The scan loop costs zero tokens. To make the 6-mind council think with a real model (Claude / OpenAI-compatible / local Ollama), see [docs/REAL_LLM.md](docs/REAL_LLM.md).

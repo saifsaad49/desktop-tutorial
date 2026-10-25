@@ -29,14 +29,37 @@ def check_ssl():
             return ss.getpeercert().get('notAfter','unknown')
 # Council thinking: each round, 6 minds debate
 def council_debate(tool, evidence):
-    # simulate 6 minds with evolving hypotheses
+    """6 minds debate. Uses a REAL LLM when configured (agent/llm.py),
+    otherwise falls back to offline templates so the loop never stalls."""
+    try:
+        from . import llm
+        if llm.available():
+            ev = evidence[:1200]
+            sys_p = ("You are the mythos_Katana council for AUTHORIZED defensive testing. "
+                     "Six roles debate one hypothesis. Be terse and evidence-driven. "
+                     "Output exactly 6 lines, each starting with the role name.")
+            nl = chr(10)
+            usr_p = nl.join([
+                f"Tool: {tool}",
+                "Live evidence (truncated):",
+                ev,
+                "",
+                "Debate as: Attacker, Defender, Auditor, Judge, Persister, Strategist.",
+                "Judge must end its line with VERDICT: CONFIRMED|REJECTED|NEEDS_MORE_TESTING",
+                "plus severity low|medium|high|critical.",
+            ])
+            out = llm.ask(sys_p, usr_p, max_tokens=500)
+            if out:
+                return out.strip(), True
+    except Exception:
+        pass
     attacker = f"Attacker: hypothesize {tool} weakness using {evidence[:40]}..."
     defender = f"Defender: check WAF/CF protection for {tool}"
-    auditor = f"Auditor: demand PROOF from live fetch"
+    auditor = "Auditor: demand PROOF from live fetch"
     judge = "Judge: evaluate based on evidence"
     persister = "Persister: keep going to new angle"
     strategist = "Strategist: pivot if blocked"
-    return attacker, defender, auditor, judge, persister, strategist
+    return " | ".join([attacker, defender, auditor, judge, persister, strategist]), False
 
 BASE=[
     "headers_check","ssl_check","robots_check","security_txt_check","csp_audit","tech_fingerprint",
@@ -49,47 +72,54 @@ EVOLVED=[
     "server_version_leak","x_powered_by_leak","cache_control_audit","cdn_config_audit",
     "endpoint_discovery","param_discovery","method_override_check","host_header_audit"
 ]
-mem=load_mem()
-i=mem.get("round",0)
-tried=set(mem.get("tried",[]))
-evolved=mem.get("evolved",0)
-all_checks=BASE+EVOLVED
-log(f"PERSISTENT council v2 (THINKING+EVOLVING) started on {TARGET} - round {i}, tried {len(tried)}/{len(all_checks)}, evolved={evolved}")
-while True:
-    remaining=[c for c in all_checks if c not in tried]
-    if not remaining:
-        evolved+=1
-        tried=set()
+
+def main():
+    mem=load_mem()
+    i=mem.get("round",0)
+    tried=set(mem.get("tried",[]))
+    evolved=mem.get("evolved",0)
+    all_checks=BASE+EVOLVED
+    log(f"PERSISTENT council v2 (THINKING+EVOLVING) started on {TARGET} - round {i}, tried {len(tried)}/{len(all_checks)}, evolved={evolved}")
+    while True:
+        remaining=[c for c in all_checks if c not in tried]
+        if not remaining:
+            evolved+=1
+            tried=set()
+            mem["evolved"]=evolved
+            log(f"Council: all {len(all_checks)} ideas exhausted pass {evolved-1} - EVOLVING to pass {evolved} with new hypotheses (NOT repeating old exactly)")
+            remaining=all_checks
+        tool=remaining[0]
+        i+=1
+        tried.add(tool)
+        mem["tried"]=list(tried)
+        mem["round"]=i
         mem["evolved"]=evolved
-        log(f"Council: all {len(all_checks)} ideas exhausted pass {evolved-1} - EVOLVING to pass {evolved} with new hypotheses (NOT repeating old exactly)")
-        remaining=all_checks
-    tool=remaining[0]
-    i+=1
-    tried.add(tool)
-    mem["tried"]=list(tried)
-    mem["round"]=i
-    mem["evolved"]=evolved
-    save_mem(mem)
-    try:
-        # LIVE evidence
-        if tool=="headers_check": ev=fetch_headers()
-        elif tool=="ssl_check": ev=check_ssl()
-        elif tool in ["robots_check","security_txt_check","sitemap_check","backup_finder","env_leak_check","git_exposed_check","openapi_check"]:
-            path_map={"robots_check":"/robots.txt","security_txt_check":"/.well-known/security.txt","sitemap_check":"/sitemap.xml","backup_finder":"/backup.zip","env_leak_check":"/.env","git_exposed_check":"/.git/","openapi_check":"/openapi.json"}
-            ev=fetch_path(path_map[tool])
-        else:
-            ev=fetch_path("/") if tool not in ["subdomain_enum"] else fetch_headers()
-        a,d,au,j,p,s=council_debate(tool, ev)
-        # judge verdict based on evidence
-        if tool=="security_txt_check" and "contact" not in ev.lower(): verdict="CONFIRMED-low (missing security.txt)"
-        elif tool=="csp_audit" and "unsafe-inline" in ev: verdict="CONFIRMED-low (permissive CSP)"
-        elif tool=="backup_finder" and "<?php" in ev or "DB_PASSWORD" in ev: verdict="CONFIRMED-high"
-        elif tool=="env_leak_check" and "APP_KEY" in ev or "DB_" in ev: verdict="CONFIRMED-critical"
-        else: verdict="REJECTED/NEEDS_MORE - documented, keep hunting"
-        log(f"round {i} (pass {evolved}) : {tool} NEW - council: [{a} | {d} | {au} | {j}->{verdict} | {p} | {s}] | evidence {len(ev)} bytes")
-        # if high/critical, alert
-        if "critical" in verdict or "high" in verdict:
-            log(f"!!! ALERT !!! {tool} {verdict} on {TARGET} - evidence snippet: {ev[:200]}")
-    except Exception as e:
-        log(f"round {i}: {tool} ERROR {type(e).__name__}:{e} | Persister: pivot to next new idea")
-    time.sleep(12)
+        save_mem(mem)
+        try:
+            # LIVE evidence
+            if tool=="headers_check": ev=fetch_headers()
+            elif tool=="ssl_check": ev=check_ssl()
+            elif tool in ["robots_check","security_txt_check","sitemap_check","backup_finder","env_leak_check","git_exposed_check","openapi_check"]:
+                path_map={"robots_check":"/robots.txt","security_txt_check":"/.well-known/security.txt","sitemap_check":"/sitemap.xml","backup_finder":"/backup.zip","env_leak_check":"/.env","git_exposed_check":"/.git/","openapi_check":"/openapi.json"}
+                ev=fetch_path(path_map[tool])
+            else:
+                ev=fetch_path("/") if tool not in ["subdomain_enum"] else fetch_headers()
+            debate, used_llm = council_debate(tool, ev)
+            # judge verdict based on evidence
+            if tool=="security_txt_check" and "contact" not in ev.lower(): verdict="CONFIRMED-low (missing security.txt)"
+            elif tool=="csp_audit" and "unsafe-inline" in ev: verdict="CONFIRMED-low (permissive CSP)"
+            elif tool=="backup_finder" and "<?php" in ev or "DB_PASSWORD" in ev: verdict="CONFIRMED-high"
+            elif tool=="env_leak_check" and "APP_KEY" in ev or "DB_" in ev: verdict="CONFIRMED-critical"
+            else: verdict="REJECTED/NEEDS_MORE - documented, keep hunting"
+            log(f"round {i} (pass {evolved}) : {tool} NEW - llm={used_llm} | evidence {len(ev)} bytes | council: {debate}")
+            # if high/critical, alert
+            if "critical" in verdict or "high" in verdict:
+                log(f"!!! ALERT !!! {tool} {verdict} on {TARGET} - evidence snippet: {ev[:200]}")
+        except Exception as e:
+            log(f"round {i}: {tool} ERROR {type(e).__name__}:{e} | Persister: pivot to next new idea")
+        time.sleep(12)
+
+
+if __name__ == "__main__":
+    main()
+
