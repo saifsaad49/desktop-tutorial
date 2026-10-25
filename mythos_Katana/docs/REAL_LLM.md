@@ -19,6 +19,22 @@ export OPENAI_BASE_URL=https://your-gateway/v1   # optional
 python -m agent.persistent
 ```
 
+## Option B2 - Hosted gateway (OpenAI-compatible relay)
+Works with any relay that exposes `/chat/completions`, e.g. a third-party gateway:
+```bash
+export KATANA_LLM_PROVIDER=openai
+export OPENAI_API_KEY=<your-gateway-key>
+export OPENAI_BASE_URL=https://<your-gateway>/api/v1
+export KATANA_LLM_MODEL=<model-id-from-/models>
+python -m agent.persistent
+```
+Discover model ids with:
+```bash
+curl -s $OPENAI_BASE_URL/models -H "Authorization: Bearer $OPENAI_API_KEY"
+```
+
+**Never commit the key.** Keep it in the environment or a file outside the repo.
+
 ## Option C - Local model (free, no token cost at all)
 ```bash
 ollama pull llama3.2
