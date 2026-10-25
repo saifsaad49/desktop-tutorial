@@ -48,16 +48,19 @@ def council_debate(tool, evidence):
                 "Judge must end its line with VERDICT: CONFIRMED|REJECTED|NEEDS_MORE_TESTING",
                 "plus severity low|medium|high|critical.",
             ])
-            out = llm.ask(sys_p, usr_p, max_tokens=500)
-            if out:
-                from .quality import validate_debate
+            from .quality import validate_debate
+            last_why = "no attempt"
+            for attempt in (1, 2):
+                out = llm.ask(sys_p, usr_p, max_tokens=700)
+                if not out:
+                    last_why = "reason=" + str(llm.LAST_ERROR)
+                    continue
                 ok, why = validate_debate(out)
                 if ok:
-                    globals()["LAST_LLM_NOTE"] = "quality=pass"
+                    globals()["LAST_LLM_NOTE"] = "quality=pass attempt=%d" % attempt
                     return out.strip(), True
-                globals()["LAST_LLM_NOTE"] = "quality=REJECT(%s)" % why
-            else:
-                globals()["LAST_LLM_NOTE"] = "reason=" + str(llm.LAST_ERROR)
+                last_why = "quality=REJECT(%s)" % why
+            globals()["LAST_LLM_NOTE"] = last_why
     except Exception as e:
         globals()["LAST_LLM_NOTE"] = "reason=%s: %s" % (type(e).__name__, e)
     attacker = f"Attacker: hypothesize {tool} weakness using {evidence[:40]}..."
