@@ -50,9 +50,14 @@ def council_debate(tool, evidence):
             ])
             out = llm.ask(sys_p, usr_p, max_tokens=500)
             if out:
-                globals()["LAST_LLM_NOTE"] = ""
-                return out.strip(), True
-            globals()["LAST_LLM_NOTE"] = "reason=" + str(llm.LAST_ERROR)
+                from .quality import validate_debate
+                ok, why = validate_debate(out)
+                if ok:
+                    globals()["LAST_LLM_NOTE"] = "quality=pass"
+                    return out.strip(), True
+                globals()["LAST_LLM_NOTE"] = "quality=REJECT(%s)" % why
+            else:
+                globals()["LAST_LLM_NOTE"] = "reason=" + str(llm.LAST_ERROR)
     except Exception as e:
         globals()["LAST_LLM_NOTE"] = "reason=%s: %s" % (type(e).__name__, e)
     attacker = f"Attacker: hypothesize {tool} weakness using {evidence[:40]}..."
