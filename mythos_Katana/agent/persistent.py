@@ -50,9 +50,11 @@ def council_debate(tool, evidence):
             ])
             out = llm.ask(sys_p, usr_p, max_tokens=500)
             if out:
+                globals()["LAST_LLM_NOTE"] = ""
                 return out.strip(), True
-    except Exception:
-        pass
+            globals()["LAST_LLM_NOTE"] = "reason=" + str(llm.LAST_ERROR)
+    except Exception as e:
+        globals()["LAST_LLM_NOTE"] = "reason=%s: %s" % (type(e).__name__, e)
     attacker = f"Attacker: hypothesize {tool} weakness using {evidence[:40]}..."
     defender = f"Defender: check WAF/CF protection for {tool}"
     auditor = "Auditor: demand PROOF from live fetch"
@@ -111,7 +113,7 @@ def main():
             elif tool=="backup_finder" and "<?php" in ev or "DB_PASSWORD" in ev: verdict="CONFIRMED-high"
             elif tool=="env_leak_check" and "APP_KEY" in ev or "DB_" in ev: verdict="CONFIRMED-critical"
             else: verdict="REJECTED/NEEDS_MORE - documented, keep hunting"
-            log(f"round {i} (pass {evolved}) : {tool} NEW - llm={used_llm} | evidence {len(ev)} bytes | council: {debate}")
+            log(f"round {i} (pass {evolved}) : {tool} NEW - llm={used_llm} {globals().get('LAST_LLM_NOTE','')} | evidence {len(ev)} bytes | council: {debate}")
             # if high/critical, alert
             if "critical" in verdict or "high" in verdict:
                 log(f"!!! ALERT !!! {tool} {verdict} on {TARGET} - evidence snippet: {ev[:200]}")
